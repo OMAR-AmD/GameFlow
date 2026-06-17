@@ -46,6 +46,9 @@ L'application est conçue pour être lancée facilement en local.
 - Python 3.10+
 - Node.js & npm (pour le frontend)
 
+> [!TIP]
+> **Base de Données Incluse** : Pour faciliter l'évaluation du projet, la base de données finale contenant les matrices SVD et les profils K-Means (`gameflow.db`) a été incluse dans le dépôt. Le projet est donc **100% Plug & Play**.
+
 ### Méthode 1 : Lancement Rapide (Windows)
 Double-cliquez simplement sur le fichier batch à la racine du projet :
 ```bash
