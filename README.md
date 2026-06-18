@@ -16,6 +16,16 @@
 
 L'objectif est de résoudre le problème de découvrabilité dans un catalogue massif de plus de 50 000 jeux, en distinguant par exemple deux joueurs de RPG : l'un qui termine scrupuleusement toutes les quêtes (complétionniste) et l'autre qui explore librement avant de passer à autre chose (zappeur).
 
+## 🗂️ Dataset Source
+Ce projet s'appuie sur deux jeux de données publics extraits de Kaggle, respectant les critères de validation académiques (taille, données réelles, hétérogénéité) :
+- **Interactions :** [Steam Video Games Dataset](https://www.kaggle.com/datasets/tamber/steam-video-games) (~200,000 logs utilisateurs).
+- **Métadonnées :** [Steam Store Games Metadata](https://www.kaggle.com/datasets/nikdavis/steam-store-games) (Genres, tags, développeurs).
+
+## 🏆 Performance du Modèle
+Le modèle a été évalué rigoureusement. Le moteur **Hybride (SVD + TF-IDF)** a largement surpassé les algorithmes de base :
+- **NDCG@10 : 0.88** (contre 0.68 pour le TF-IDF pur et 0.74 pour le User-Based KNN).
+- Le clustering K-Means a obtenu un **Silhouette Score de 0.62**, validant la pertinence mathématique des 5 Personas.
+
 ## ✨ Fonctionnalités Principales (Dépassant la proposition initiale)
 
 Nous avons transformé la proposition de modèle ML statique en un véritable **produit complet (Full-Stack Data Application)** :
@@ -56,7 +66,7 @@ Double-cliquez simplement sur le fichier batch à la racine du projet :
 ```
 Cela démarrera automatiquement le serveur Backend (port 8000) et le serveur Frontend (port 5173/5174), puis ouvrira votre navigateur.
 
-### Méthode 2 : Lancement Manuel
+### Méthode 2 : Lancement Manuel (Dashboard seul)
 1. **Démarrer l'API Backend :**
 ```bash
 # Depuis la racine du projet
@@ -72,6 +82,20 @@ npm install
 npm run dev
 ```
 Accédez ensuite à l'URL locale fournie par Vite (ex: `http://localhost:5173`).
+
+### 🔬 Instructions pour reproduire les modèles (Data Science Pipeline)
+Pour ré-entraîner les modèles depuis zéro et vérifier l'ensemble du pipeline (Phase 1 à 5) sur un environnement propre :
+
+1. Installez les dépendances : `pip install -r requirements.txt`
+2. Assurez-vous d'avoir téléchargé les données brutes dans le dossier `data/raw/` (les CSV sont ignorés par Git en raison de leur taille).
+3. Exécutez les scripts de création de base de données : `python src/data_ingestion.py`
+4. Exécutez les notebooks **dans cet ordre strict** :
+   - `notebooks/02_eda_and_wrangling.ipynb`
+   - `notebooks/03_feature_engineering.ipynb`
+   - `notebooks/04_unsupervised_learning.ipynb` (Générera les modèles sérialisés dans `/models`)
+   - `notebooks/05_recommender_testing.ipynb`
+   - `notebooks/06_evaluation.ipynb`
+Tous les notebooks ont été conçus pour s'exécuter sans erreur du début à la fin.
 
 ---
 *Ce projet est une création originale de l'équipe dans le cadre académique de l'EHTP.*
