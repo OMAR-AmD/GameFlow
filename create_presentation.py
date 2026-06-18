@@ -2,12 +2,12 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 
-# Initialiser la présentation
+# Initialize the presentation
 prs = Presentation()
 
-# Fonctions utilitaires
+# Utility functions
 def add_title_slide(prs, title_text, subtitle_text):
-    slide_layout = prs.slide_layouts[0] # Titre
+    slide_layout = prs.slide_layouts[0] # Title Layout
     slide = prs.slides.add_slide(slide_layout)
     title = slide.shapes.title
     subtitle = slide.placeholders[1]
@@ -16,7 +16,7 @@ def add_title_slide(prs, title_text, subtitle_text):
     return slide
 
 def add_bullet_slide(prs, title_text, bullet_points):
-    slide_layout = prs.slide_layouts[1] # Titre et Contenu
+    slide_layout = prs.slide_layouts[1] # Title and Content
     slide = prs.slides.add_slide(slide_layout)
     title = slide.shapes.title
     title.text = title_text
@@ -35,104 +35,105 @@ def add_bullet_slide(prs, title_text, bullet_points):
             
     return slide
 
-# Slide 1 : Titre
+# Slide 1: Title
 add_title_slide(
     prs, 
     "GameFlow AI", 
-    "Behavior-Driven Game Recommendation System\n\nPréparé par : Akby Anass & Omar Amdouni\nEHTP - MIG (2025-2026)"
+    "Behavior-Driven Game Recommendation System\n\nPrepared by: Akby Anass & Omar Amdouni\nEHTP - MIG (2025-2026)"
 )
 
-# Slide 2 : Le Problème
+# Slide 2: Context & Problem Statement
 add_bullet_slide(
     prs,
-    "1. Contexte & Problématique",
+    "1. Context & Problem Statement",
     [
-        "Le défi de la plateforme Steam : plus de 50 000 jeux vidéo disponibles.",
-        "Limites des systèmes classiques :",
-        "- Se basent souvent uniquement sur les tags (RPG, Action).",
-        "- Incapables de différencier deux joueurs de RPG (un complétionniste vs un explorateur).",
-        "Notre objectif :",
-        "- Créer un moteur de recommandation basé sur le comportement réel (temps de jeu)."
+        "The Discoverability Crisis on Steam: Over 50,000 video games available.",
+        "Limitations of Traditional Systems:",
+        "- Rely heavily on explicit tags (e.g., RPG, Action) and sparse 5-star ratings.",
+        "- Unable to distinguish player psychographics (Completionist vs Explorer).",
+        "Our Solution (GameFlow AI):",
+        "- Shift from recommending by 'genre' to recommending by 'actual behavior'.",
+        "- Leverage implicit feedback (hours played) as the ultimate truth of engagement."
     ]
 )
 
-# Slide 3 : Feature Engineering
+# Slide 3: Data & Feature Engineering
 add_bullet_slide(
     prs,
-    "2. Données & Feature Engineering",
+    "2. Data & Feature Engineering",
     [
-        "Les données : Dataset Steam-200k (Interactions) & Steam Metadata (Genres).",
-        "Le temps de jeu comme proxy comportemental fort.",
-        "Création de métriques sur-mesure :",
-        "- Session Intensity (Temps de jeu / Médiane)",
-        "- Completion Ratio",
-        "- Competitive Index",
-        "- Abandonment Rate (Taux d'abandon avant 1 heure)"
+        "Datasets: Steam-200k (User Interactions) & Steam Metadata (Game Tags).",
+        "Transforming raw playtime into Behavioral Proxies:",
+        "- Session Intensity: User playtime divided by global median playtime.",
+        "- Completion Ratio: % of games beaten based on main campaign length.",
+        "- Competitive Index: Affinity for multiplayer/eSports environments.",
+        "- Exploration Score & Narrative Affinity.",
+        "- Abandonment Rate: % of games dropped before the 1.5-hour mark."
     ]
 )
 
-# Slide 4 : Apprentissage Non-Supervisé
+# Slide 4: Unsupervised Behavioral Profiling
 add_bullet_slide(
     prs,
-    "3. Le Profilage : Clustering K-Means",
+    "3. Behavioral Profiling (K-Means)",
     [
-        "Application de PCA et K-Means sur les métriques comportementales.",
-        "Extraction de 5 Personas clés :",
-        "1. Compétiteur Hardcore (47% - Multijoueur intense)",
-        "2. Collectionneur Versatile (19.5% - Touche à tout)",
-        "3. Zappeur Curieux (17% - Abandon rapide)",
-        "4. Marathonien Passionné (8.5% - Sessions très longues)",
-        "5. Explorateur Narratif (8% - Focus sur l'histoire)"
+        "Applied PCA & K-Means Clustering on the behavioral vectors.",
+        "Mathematically extracted 5 distinct Player Personas:",
+        "1. The Hardcore Competitor (47%): Extreme session intensity, multiplayer focus.",
+        "2. The Versatile Collector (19.5%): Highest genre diversity.",
+        "3. The Curious Zapper (17%): High abandonment rate, low commitment.",
+        "4. The Passionate Marathoner (8.5%): Massive total hours investment.",
+        "5. The Narrative Explorer (8%): High story and open-world affinity."
     ]
 )
 
-# Slide 5 : Le Modèle Hybride
+# Slide 5: The Hybrid Recommendation Engine
 add_bullet_slide(
     prs,
-    "4. Le Moteur de Recommandation Hybride",
+    "4. The Hybrid Recommendation Engine",
     [
-        "Filtrage Collaboratif (SVD) :",
-        "- Factorisation de la matrice Joueur-Jeu (TruncatedSVD).",
-        "- Identification des goûts latents.",
-        "Filtrage Basé sur le Contenu (TF-IDF) :",
-        "- Similarité cosinus sur les genres des jeux.",
-        "La fusion (Hybride) :",
-        "- Score = α * SVD + (1-α) * TF-IDF",
-        "- Permet de résoudre le problème du démarrage à froid (Cold Start)."
+        "Collaborative Filtering via Matrix Factorization (SVD):",
+        "- TruncatedSVD compresses the sparse User-Item matrix.",
+        "- Identifies latent play-styles and community trends.",
+        "Content-Based Filtering (TF-IDF):",
+        "- Cosine similarity applied to game descriptions and tags.",
+        "The Hybrid Formula:",
+        "- Score = (Alpha * SVD Score) + ((1 - Alpha) * TF-IDF Score).",
+        "- Delivers serendipity while ensuring genre relevance."
     ]
 )
 
-# Slide 6 : L'Application Web
+# Slide 6: Application & Explainable AI
 add_bullet_slide(
     prs,
-    "5. Application Full-Stack & Explainable AI",
+    "5. Full-Stack Deployment & Explainable AI",
     [
-        "Architecture moderne : Base SQLite + API FastAPI + Frontend React/Vite.",
-        "Solveur de 'Cold Start' innovant :",
-        "- Déduction de la Persona via un questionnaire initial.",
-        "L'IA Explicable (Explainable AI) :",
-        "- Justification claire de chaque recommandation.",
-        "- Exemple : 'Score Collaboratif 85% - Score Contenu 15%'.",
-        "Dashboard Analytique Administrateur (Recharts)."
+        "Architecture: SQLite3 -> FastAPI (Backend) -> React/Vite (Frontend).",
+        "Innovative 'Cold Start' Solver:",
+        "- Infers Persona instantly from 3 initial game selections.",
+        "Explainable AI (XAI) Implementation:",
+        "- The UI explicitly justifies every algorithmic decision.",
+        "- Example: 'Collaborative Score: 85% | Content Score: 15%'.",
+        "Admin Analytics Dashboard: Real-time telemetry via Recharts."
     ]
 )
 
-# Slide 7 : Conclusion
+# Slide 7: Conclusion
 add_bullet_slide(
     prs,
-    "6. Conclusion",
+    "6. Conclusion & Perspectives",
     [
-        "Le comportement (temps de jeu) est plus riche que le simple genre.",
-        "Dépassement du cahier des charges initial :",
-        "- Produit final déployable (FastAPI + React).",
-        "- Tableaux de bord télémétriques.",
-        "Perspectives :",
-        "- Deep Learning (RNN) pour l'ordre chronologique des jeux.",
-        "- Déploiement Cloud via Docker."
+        "Achievement: Built an end-to-end Machine Learning product.",
+        "Key Takeaway:",
+        "- Implicit behavior (playtime) yields far richer recommendations than static genre tags.",
+        "Future Perspectives:",
+        "- Deep Sequential Models (RNN/Transformers) for chronologically aware recommendations.",
+        "- Cloud deployment via Docker and Kubernetes.",
+        "Thank you for your attention. Q&A."
     ]
 )
 
-# Sauvegarder la présentation
+# Save the presentation
 output_filename = "GameFlow_Presentation.pptx"
 prs.save(output_filename)
-print(f"Présentation générée avec succès : {output_filename}")
+print(f"Presentation successfully generated: {output_filename}")
