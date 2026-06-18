@@ -1,0 +1,153 @@
+\documentclass[12pt, a4paper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{amsmath}
+
+% Configuration de la géométrie de la page
+\geometry{a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% Configuration des en-têtes et pieds de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{GameFlow AI}
+\fancyhead[R]{EHTP - 2025/2026}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+% --- Page de Garde ---
+\begin{titlepage}
+    \centering
+    {\Large \textbf{Ecole Hassania des Travaux Publics (EHTP)}}\\[0.5cm]
+    {\large Département de Mathématiques, Informatique \& Géomatique}\\[3cm]
+
+    {\huge \textbf{GameFlow AI}}\\[0.5cm]
+    {\LARGE \textit{Behavior-Driven Game Recommendation System}}\\[3cm]
+
+    \textbf{Préparé par :}\\[0.2cm]
+    Akby Anass \& Omar Amdouni\\[1.5cm]
+
+    \textbf{Module :}\\[0.2cm]
+    AI \& Data Science Basics\\[1.5cm]
+
+    \textbf{Encadré par :}\\[0.2cm]
+    Dr. Rym Nassih\\[3cm]
+
+    \vfill
+    {\large Année Universitaire : 2025 - 2026}
+\end{titlepage}
+
+% --- Table des matières ---
+\tableofcontents
+\newpage
+
+% --- Introduction ---
+\chapter{Introduction Générale}
+\section{Contexte et Motivation}
+Avec plus de 50 000 jeux vidéo disponibles sur la plateforme Steam, la découvrabilité est devenue un défi majeur tant pour les joueurs que pour les développeurs. Les moteurs de recommandation traditionnels se limitent souvent à des approches basées sur des balises (tags) ou des genres. Ces systèmes peinent à distinguer deux utilisateurs qui, bien que jouant au même jeu (par exemple, un RPG), ont des comportements diamétralement opposés : l'un peut être un complétionniste cherchant à terminer chaque quête, tandis que l'autre est un explorateur qui abandonne rapidement pour tester d'autres titres.
+
+\section{Problématique}
+Comment concevoir un moteur de recommandation qui s'appuie non pas uniquement sur le genre des jeux, mais sur le \textbf{profil comportemental} réel du joueur ?
+
+\section{Objectifs du Projet : GameFlow AI}
+Le projet \textbf{GameFlow AI} vise à construire un système de recommandation hybride complet (Full-Stack). Nos objectifs sont :
+\begin{enumerate}
+    \item Réaliser un \textit{Feature Engineering} poussé pour déduire des comportements (intensité, compétition, complétion) à partir du simple temps de jeu.
+    \item Découvrir des archétypes de joueurs de manière non-supervisée (Clustering K-Means).
+    \item Construire un moteur hybride alliant filtrage collaboratif (SVD) et analyse de contenu (TF-IDF).
+    \item Fournir une application web interactive et démontrer le principe d'\textit{Explainable AI} en expliquant les choix du modèle à l'utilisateur.
+\end{enumerate}
+
+% --- Chapitre 1 ---
+\chapter{Données et Traitement}
+\section{Acquisition et Analyse des Données (EDA)}
+Notre étude s'appuie sur deux sources principales :
+\begin{itemize}
+    \item \textbf{Steam-200k Dataset} : Fournit des données brutes d'interactions utilisateurs (user\_id, game\_name, behavior, hours\_played).
+    \item \textbf{Steam Metadata} : Fournit des informations descriptives sur les jeux (genres, développeurs, temps de jeu médian global).
+\end{itemize}
+
+Lors de l'Analyse Exploratoire des Données (EDA), nous avons identifié que la distribution du temps de jeu suit une loi de puissance extrême (loi de Pareto). La grande majorité des joueurs ne joue que quelques heures, tandis qu'une minorité (les joueurs hardcore) accumule des milliers d'heures sur une poignée de titres multijoueurs (ex: \textit{Dota 2}, \textit{CS:GO}). 
+
+\section{Feature Engineering : Création de variables comportementales}
+Puisque les données de sessions détaillées ne sont pas disponibles publiquement, nous avons dû créer des "proxys" comportementaux solides :
+\begin{itemize}
+    \item \textbf{Session Intensity} : Ratio entre le temps de jeu de l'utilisateur et le temps de jeu médian global du jeu.
+    \item \textbf{Competitive Index} : Propension à jouer à des jeux étiquetés "Multiplayer".
+    \item \textbf{Completion Ratio} : Proportion de jeux où l'utilisateur a dépassé le temps de jeu médian estimé pour la campagne principale.
+    \item \textbf{Exploration Score} : Temps passé sur des jeux "Open World".
+    \item \textbf{Narrative Affinity} : Temps passé sur des jeux "Story Rich" ou "RPG".
+    \item \textbf{Diversity Score} : Nombre de genres uniques abordés par le joueur divisé par la taille de sa bibliothèque.
+    \item \textbf{Abandonment Rate} : Pourcentage de jeux testés moins d'une heure.
+\end{itemize}
+
+% --- Chapitre 2 ---
+\chapter{Apprentissage Non-Supervisé : Profilage Comportemental}
+\section{Clustering avec K-Means}
+Afin de comprendre la structure de notre base de joueurs, nous avons appliqué l'algorithme K-Means sur les caractéristiques comportementales fraîchement générées (après standardisation via \texttt{StandardScaler} et réduction de dimension via \texttt{PCA}). La méthode du "coude" (Elbow Method) et le score de Silhouette nous ont indiqué que \textbf{k=5} était un nombre optimal de clusters.
+
+\section{Analyse des 5 Personas Extraites}
+Les 5 clusters obtenus correspondent de manière frappante à des archétypes de joueurs réels documentés dans la littérature du Game Design :
+\begin{enumerate}
+    \item \textbf{Le Zappeur Curieux (Cluster 0)} : Représente 17\% des joueurs. Avec un taux d'abandon de 95\% et un temps de jeu moyen de 3.8h, ce profil essaie beaucoup de jeux très brièvement.
+    \item \textbf{L'Explorateur Narratif (Cluster 1)} : Représente 8\%. Possède une forte affinité narrative (86\%) et un grand intérêt pour l'exploration (61\%).
+    \item \textbf{Le Compétiteur Hardcore (Cluster 2)} : Le plus grand cluster (47\% des joueurs). Possède un indice de compétition de 1.00 (maximum). Il se focalise sur quelques jeux multijoueurs de manière acharnée avec plus de 114h en moyenne.
+    \item \textbf{Le Marathonien Passionné (Cluster 3)} : 8.5\% de la base. Des sessions ultra-longues (15h d'intensité moyenne) et un investissement immense.
+    \item \textbf{Le Collectionneur Versatile (Cluster 4)} : 19.5\%. Touche à tout, joue à une grande diversité de genres (score de diversité à 35\%).
+\end{enumerate}
+
+% --- Chapitre 3 ---
+\chapter{Moteur de Recommandation Hybride}
+\section{Limites des modèles simples}
+Un modèle \textit{User-Based KNN} a d'abord été envisagé mais s'est avéré trop gourmand en mémoire pour notre matrice creuse, tout en étant vulnérable au problème du "Cold Start" (démarrage à froid).
+
+\section{Filtrage Collaboratif par SVD}
+Nous avons implémenté la Décomposition en Valeurs Singulières (\texttt{TruncatedSVD}) sur la matrice Joueur-Jeu. L'avantage du SVD est sa capacité à identifier des facteurs latents cachés (les "goûts" partagés implicitement entre utilisateurs) tout en réduisant considérablement la dimension de notre matrice creuse. Les scores générés reflètent la probabilité qu'un utilisateur apprécie un jeu, en se basant sur le comportement d'utilisateurs similaires.
+
+\section{Filtrage Basé sur le Contenu (TF-IDF)}
+En parallèle, nous appliquons un algorithme TF-IDF (Term Frequency-Inverse Document Frequency) sur les genres des jeux pour créer une mesure de similarité cosinus. Si l'utilisateur aime "Skyrim", le système saura mathématiquement que "The Witcher 3" lui est structurellement similaire.
+
+\section{Le Modèle Hybride et le Cold Start Comportemental}
+Le score final combine les deux approches :
+\[ Score = \alpha \times SVD_{score} + (1 - \alpha) \times CBF_{score} \]
+
+\textbf{Résolution du "Cold Start" :} Pour un nouvel utilisateur sans historique, notre interface lui demande de choisir quelques jeux. Le système déduit instantanément à quelle Persona K-Means il appartient, et lui recommande les jeux les plus populaires au sein de son cluster comportemental spécifique, fusionnés avec une similarité TF-IDF. 
+
+% --- Chapitre 4 ---
+\chapter{Implémentation Full-Stack et "Explainable AI"}
+\section{Architecture Technique}
+GameFlow n'est pas qu'un modèle statistique abstrait. Nous l'avons déployé via :
+\begin{itemize}
+    \item \textbf{Base de données (SQLite3)} : Stocke les interactions, les métadonnées et nos modèles matriciels exportés.
+    \item \textbf{API Backend (FastAPI)} : Expose les points de terminaison pour la prédiction et l'analytique.
+    \item \textbf{Frontend (React \& Vite)} : Une interface moderne (Glassmorphism).
+\end{itemize}
+
+\section{Explainable AI (XAI)}
+Un des plus grands enjeux actuels de l'IA est son opacité ("Boîte Noire"). Pour GameFlow, nous avons fait le choix de l'explicabilité. Lorsqu'un jeu est recommandé, l'interface affiche explicitement la justification de l'algorithme :
+\begin{quote}
+\textit{"Score Collaboratif (SVD) : 85\% · Score Contenu (Genres) : 15\% — Similaire à vos favoris."}
+\end{quote}
+ou bien :
+\begin{quote}
+\textit{"Votre sélection correspond à la Persona 'Compétiteur Hardcore'. Ce jeu est le \#1 le plus joué par ce groupe."}
+\end{quote}
+
+\section{Dashboard Analytique Administrateur}
+Nous avons implémenté un système de télémétrie visuelle via \texttt{Recharts}. L'administrateur peut visualiser la distribution des Personas (Pie Chart), le temps de jeu moyen par comportement, et les genres les plus populaires basés sur \textbf{le véritable temps de jeu} et non la simple taille du catalogue.
+
+% --- Conclusion ---
+\chapter{Conclusion et Perspectives}
+Le projet \textbf{GameFlow AI} démontre que le comportement explicite des joueurs (le temps de jeu investi) est une métrique infiniment plus riche et sincère qu'un simple tag "Action" ou "RPG". En construisant ce pipeline complet allant de l'acquisition des données à l'interface utilisateur, nous avons dépassé les objectifs initiaux du cahier des charges.
+
+En perspective, l'intégration de données séquentielles (l'ordre dans lequel les jeux sont joués via des modèles RNN) ou le déploiement continu via Docker constitueraient d'excellentes prochaines étapes pour amener GameFlow vers un environnement de production grand public.
+
+\end{document}
